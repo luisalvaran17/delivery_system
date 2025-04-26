@@ -5,6 +5,7 @@ from addresses.serializers import AddressSerializer
 
 class DriverSerializer(serializers.ModelSerializer):
     current_address = AddressSerializer()
+
     class Meta:
         model = Driver
         fields = ['id', 'name', 'current_address', 'is_available']
@@ -39,6 +40,7 @@ class DriverSerializer(serializers.ModelSerializer):
         """
         if not isinstance(value, dict):  # Ensure the address is a dictionary
             raise serializers.ValidationError("The address must be a dictionary with the necessary data.")
+        return value
 
     def validate_is_available(self, value):
         """
