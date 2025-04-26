@@ -3,7 +3,7 @@
 
 ## Introduction
 
-This is a backend system for a delivery service that allows users to manage addresses, assign services to drivers, and authenticate via JWT. The project is built using the following technologies:
+This is a backend system for a delivery service that allows users to manage addresses, manage drivers, assign services to drivers. The project is built using the following technologies:
 
 - **Python 3.x**: The programming language used for backend development.
 - **Django**: The web framework used to build the application.
