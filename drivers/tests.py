@@ -15,32 +15,51 @@ class DriverModelTest(TestCase):
 
     def test_create_driver(self):
         """Test creating a driver."""
+        # Create a user for the driver
+        user = User.objects.create_user(
+            username="carlos_perez",
+            password="password",
+            email="carlos@example.com"
+        )
+
+        # Create the driver and associate it with the user
         driver = Driver.objects.create(
-            name="Carlos Pérez",
+            user=user,
             current_address=self.address,
             is_available=True,
         )
 
         # Verify that the driver was created successfully in the database
         self.assertEqual(Driver.objects.count(), 1)
-        self.assertEqual(driver.name, "Carlos Pérez")
+        self.assertEqual(driver.user.username, "carlos_perez")  # Check the user related to the driver
         self.assertEqual(driver.current_address, self.address)
         self.assertEqual(driver.is_available, True)
 
     def test_driver_str_method(self):
         """Test the __str__ method for driver."""
+        user = User.objects.create_user(
+            username="ana_garcia",
+            password="password",
+            email="ana@example.com"
+        )
         driver = Driver.objects.create(
-            name="Ana García",
+            user=user,
             current_address=self.address,
             is_available=True,
         )
-        # Verify that the string representation of the driver matches the expected name
-        self.assertEqual(str(driver), "Ana García")
+
+        # Verify that the string representation of the driver matches the user's username or full name
+        self.assertEqual(str(driver), "ana_garcia")  # Here we use the username of the user
 
     def test_driver_is_available(self):
         """Test changing the availability of the driver."""
+        user = User.objects.create_user(
+            username="jorge_lopez",
+            password="password",
+            email="jorge@example.com"
+        )
         driver = Driver.objects.create(
-            name="Jorge López",
+            user=user,
             current_address=self.address,
             is_available=True,
         )
@@ -63,8 +82,12 @@ class DriverSerializerTest(TestCase):
             street="Carrera 45", city="Medellín", latitude=6.2442, longitude=-75.5812
         )
 
+        # Create a user for the driver
+        self.user = User.objects.create_user(username="maria", password="testpass")
+
+        # Valid data for the driver, including the user ID
         self.driver_data = {
-            "name": "María Fernández",
+            "user": self.user.id,
             "current_address": {
                 "street": "Carrera 45",
                 "city": "Medellín",
@@ -76,26 +99,15 @@ class DriverSerializerTest(TestCase):
 
     def test_driver_serializer_valid(self):
         """Test the driver serializer with valid data."""
-        
         from drivers.serializers import DriverSerializer
+        print('self.driver_data', self.driver_data)
         serializer = DriverSerializer(data=self.driver_data)
-        
-        self.assertTrue(serializer.is_valid())
+
+        self.assertTrue(serializer.is_valid())  # Verify that the serializer is valid
         driver = serializer.save()
 
-        # Verify that the driver's name matches the input data
-        self.assertEqual(driver.name, self.driver_data['name'])
-        
-        # Verify that the driver's availability matches the input data
+        # Verify that the driver's user matches the provided user
+        self.assertEqual(driver.user.username, self.user.username)
+
+        # Verify that the driver's availability matches the provided data
         self.assertEqual(driver.is_available, self.driver_data['is_available'])
-
-    def test_driver_serializer_invalid(self):
-        """Test the driver serializer with invalid data."""
-        
-        from drivers.serializers import DriverSerializer
-        invalid_data = self.driver_data.copy()
-        invalid_data['name'] = ""  # Nombre inválido
-
-        serializer = DriverSerializer(data=invalid_data)
-        self.assertFalse(serializer.is_valid())  # The serializer should be invalid due to the empty name
-        self.assertIn('name', serializer.errors)  # Verify that the error is in the 'name' field
