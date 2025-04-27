@@ -6,3 +6,4 @@ PyJWT==2.10.1
 pytest==7.0.0
 pytest-django==4.5.0
 openrouteservice==2.3.3
+Faker==37.1.0

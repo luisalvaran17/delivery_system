@@ -14,8 +14,10 @@ class CompleteServiceViewTests(TestCase):
         # Create users
         self.client_user = User.objects.create_user(username='client', password='testpass')
         self.driver_user = User.objects.create_user(username='driver', password='testpass')
+
         profile = self.driver_user.userprofile
         profile.is_driver = True
+        profile.save()
 
         # Create addresses
         self.pickup_address = Address.objects.create(
@@ -34,7 +36,7 @@ class CompleteServiceViewTests(TestCase):
 
         # create Driver
         self.driver = Driver.objects.create(
-            name='Driver Name',
+            user=self.driver_user,  # Associate the driver with the user
             current_address=self.driver_address,
             is_available=True
         )
