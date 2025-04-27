@@ -2,9 +2,11 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 class CustomUser(AbstractUser):
+    class Meta:
+        app_label = 'user'
+
     CLIENT = 'client'
     DRIVER = 'driver'
-    ADMIN = 'admin'
 
     ROLE_CHOICES = [
         (CLIENT, 'Client'),
