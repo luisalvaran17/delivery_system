@@ -69,7 +69,6 @@ class CompleteServiceView(generics.UpdateAPIView):
 
         # Ensure that the user is a driver
         user_profile = request.user.userprofile
-        print('user_profile', user_profile)
         if not user_profile.is_driver:
             return Response({'error': 'Only drivers can complete a service.'}, status=status.HTTP_403_FORBIDDEN)
 
