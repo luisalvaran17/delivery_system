@@ -1,8 +1,9 @@
 from django.db import models
 from addresses.models import Address
+from django.contrib.auth.models import User
 
 class Driver(models.Model):
-    name = models.CharField(max_length=100)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='driver_profile')
     current_address = models.ForeignKey(Address, on_delete=models.CASCADE)
     is_available = models.BooleanField(default=True)
 

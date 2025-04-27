@@ -5,10 +5,11 @@ from addresses.serializers import AddressSerializer
 
 class DriverSerializer(serializers.ModelSerializer):
     current_address = AddressSerializer()
+    user = serializers.StringRelatedField()
 
     class Meta:
         model = Driver
-        fields = ['id', 'name', 'current_address', 'is_available']
+        fields = ['id', 'user', 'current_address', 'is_available']
 
     def create(self, validated_data):
         """
@@ -25,14 +26,6 @@ class DriverSerializer(serializers.ModelSerializer):
         driver = Driver.objects.create(current_address=address, **validated_data)
 
         return driver
-
-    def validate_name(self, value):
-        """
-        Validates that the name contains only letters and spaces.
-        """
-        if not value.isalpha() and ' ' not in value:
-            raise serializers.ValidationError("The name can only contain letters and spaces.")
-        return value
 
     def validate_current_address(self, value):
         """
