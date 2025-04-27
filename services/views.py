@@ -1,10 +1,14 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 
-from addresses.models import Address
 from .models import ServiceRequest
 from .serializers import ServiceRequestSerializer
-from services.helpers import find_nearest_driver
+from services.service_request_management import (
+    create_pickup_address, assign_driver_to_service, 
+    create_service_request, update_driver_availability,
+    update_service_driver
+)
 
 
 class ServiceRequestListCreateView(generics.ListCreateAPIView):
@@ -12,31 +16,36 @@ class ServiceRequestListCreateView(generics.ListCreateAPIView):
     serializer_class = ServiceRequestSerializer
     
     def create(self, request, *args, **kwargs):
-        print('heeree')
         pickup_address_data = request.data.get('pickup_address')
 
         if not pickup_address_data:
             return Response({'error': 'pickup_address is required'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Create the pickup address
-        pickup_address = Address.objects.create(**pickup_address_data)
+        try:
+            pickup_address = create_pickup_address(pickup_address_data)
+        except ValidationError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         # Find an available driver and choose the closest one
-        available_nearest_driver, _, estimated_time = find_nearest_driver(pickup_address)
+        try:
+            available_nearest_driver, estimated_time = assign_driver_to_service(pickup_address)
+        except ValidationError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not available_nearest_driver:
-            return Response({'error': 'No available drivers'}, status=status.HTTP_404_NOT_FOUND)
+        # Create the service request
+        try:
+            service_request = create_service_request(pickup_address, available_nearest_driver, estimated_time)
+        except ValidationError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        service_request = ServiceRequest.objects.create(
-            pickup_address=pickup_address,
-            assigned_driver=available_nearest_driver,
-            estimated_time_minutes=estimated_time,
-            status='in progress'
-        )
+        # Update the driver status to unavailable
+        try:
+            update_driver_availability(available_nearest_driver)
+        except ValidationError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        available_nearest_driver.is_available = False
-        available_nearest_driver.save()
-
+        # Serialize the service request and return the response
         serializer = self.get_serializer(service_request)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -44,3 +53,28 @@ class ServiceRequestListCreateView(generics.ListCreateAPIView):
 class ServiceRequestRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = ServiceRequest.objects.all()
     serializer_class = ServiceRequestSerializer
+
+
+class CompleteServiceView(generics.UpdateAPIView):
+    queryset = ServiceRequest.objects.all()
+    serializer_class = ServiceRequestSerializer
+
+    def update(self, request, *args, **kwargs):
+        # Ensure the service exists
+        try:
+            service = self.get_object()
+        except ServiceRequest.DoesNotExist:
+            raise ValidationError(detail="Service not found.")  # 404 Not Found
+
+        status_service = request.data.get('status', '')
+        if status_service != 'completed':
+            raise ValidationError(detail="Invalid status. Only 'completed' is allowed.")  # 400 Bad Request
+
+        # Mark the service as completed
+        try:
+            update_service_driver(service, status_service)
+        except ValidationError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Return response with updated service
+        return Response(self.serializer_class(service).data, status=status.HTTP_200_OK)
