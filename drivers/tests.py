@@ -80,8 +80,6 @@ class DriverSerializerTest(TestCase):
         from drivers.serializers import DriverSerializer
         serializer = DriverSerializer(data=self.driver_data)
         
-        if not serializer.is_valid():
-            print('serializer errors:', serializer.errors)
         self.assertTrue(serializer.is_valid())
         driver = serializer.save()
 

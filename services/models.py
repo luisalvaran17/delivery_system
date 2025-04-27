@@ -1,6 +1,7 @@
 from django.db import models
 from addresses.models import Address
 from drivers.models import Driver
+from django.contrib.auth.models import User
 
 class ServiceRequest(models.Model):
     class Status(models.TextChoices):
@@ -9,6 +10,7 @@ class ServiceRequest(models.Model):
         COMPLETED = 'completed', 'Completed'
         CANCELLED = 'cancelled', 'Cancelled'
 
+    client = models.ForeignKey(User, on_delete=models.CASCADE)
     pickup_address = models.ForeignKey(Address, on_delete=models.CASCADE)
     assigned_driver = models.ForeignKey(Driver, on_delete=models.SET_NULL, null=True, blank=True)
     estimated_time_minutes = models.IntegerField(null=True, blank=True)

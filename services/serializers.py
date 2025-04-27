@@ -7,10 +7,11 @@ from drivers.serializers import DriverSerializer
 class ServiceRequestSerializer(serializers.ModelSerializer):
     pickup_address = AddressSerializer(read_only=True)
     assigned_driver = DriverSerializer(read_only=True)
+    client = serializers.StringRelatedField()
 
     class Meta:
         model = ServiceRequest
-        fields = ['id', 'pickup_address', 'assigned_driver', 'estimated_time_minutes', 'created_at', 'status']
+        fields = ['id', 'client', 'pickup_address', 'assigned_driver', 'estimated_time_minutes', 'created_at', 'status']
 
         def validate_status(self, value):
             """
