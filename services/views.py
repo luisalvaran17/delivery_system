@@ -35,7 +35,8 @@ class ServiceRequestListCreateView(generics.ListCreateAPIView):
 
         # Create the service request
         try:
-            service_request = create_service_request(pickup_address, available_nearest_driver, estimated_time)
+            client = request.user
+            service_request = create_service_request(client, pickup_address, available_nearest_driver, estimated_time)
         except ValidationError as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -65,6 +66,12 @@ class CompleteServiceView(generics.UpdateAPIView):
             service = self.get_object()
         except ServiceRequest.DoesNotExist:
             raise ValidationError(detail="Service not found.")  # 404 Not Found
+
+        # Ensure that the user is a driver
+        user_profile = request.user.userprofile
+        print('user_profile', user_profile)
+        if not user_profile.is_driver:
+            return Response({'error': 'Only drivers can complete a service.'}, status=status.HTTP_403_FORBIDDEN)
 
         status_service = request.data.get('status', '')
         if status_service != 'completed':

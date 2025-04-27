@@ -28,12 +28,13 @@ def assign_driver_to_service(pickup_address):
     return available_nearest_driver, estimated_time
 
 
-def create_service_request(pickup_address, assigned_driver, estimated_time):
+def create_service_request(client, pickup_address, assigned_driver, estimated_time):
     """
     Creates a service request with the pickup address and the assigned driver.
     """
     try:
         service_request = ServiceRequest.objects.create(
+            client=client,
             pickup_address=pickup_address,
             assigned_driver=assigned_driver,
             estimated_time_minutes=estimated_time,
