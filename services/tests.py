@@ -11,13 +11,13 @@ class CompleteServiceViewTests(TestCase):
     def setUp(self):
         self.client = APIClient()
 
-        # Crear usuarios
+        # Create users
         self.client_user = User.objects.create_user(username='client', password='testpass')
         self.driver_user = User.objects.create_user(username='driver', password='testpass')
         profile = self.driver_user.userprofile
         profile.is_driver = True
 
-        # Crear direcciones
+        # Create addresses
         self.pickup_address = Address.objects.create(
             street='Cl. 68a #90a – 31',
             city='Bogotá',
@@ -32,14 +32,14 @@ class CompleteServiceViewTests(TestCase):
             longitude=-74.0721
         )
 
-        # Crear Driver
+        # create Driver
         self.driver = Driver.objects.create(
             name='Driver Name',
             current_address=self.driver_address,
             is_available=True
         )
 
-        # Crear solicitud de servicio
+        # create servic request
         self.service_request = ServiceRequest.objects.create(
             client=self.client_user,
             pickup_address=self.pickup_address,
@@ -51,7 +51,7 @@ class CompleteServiceViewTests(TestCase):
         self.url = reverse('complete-service', kwargs={'pk': self.service_request.pk})
 
     def test_driver_can_complete_service(self):
-        """Un conductor puede completar un servicio"""
+        """A driver can complete a service"""
         self.client.force_authenticate(user=self.driver_user)
         response = self.client.patch(self.url, {'status': 'completed'}, format='json')
 
@@ -60,7 +60,7 @@ class CompleteServiceViewTests(TestCase):
         self.assertEqual(self.service_request.status, 'completed')
 
     def test_client_cannot_complete_service(self):
-        """Un cliente normal no puede completar un servicio"""
+        """A regular client cannot complete a service"""
         self.client.force_authenticate(user=self.client_user)
         response = self.client.patch(self.url, {'status': 'completed'}, format='json')
 
@@ -68,7 +68,7 @@ class CompleteServiceViewTests(TestCase):
         self.assertIn('Only drivers can complete a service.', response.json()['error'])
 
     def test_driver_cannot_set_invalid_status(self):
-        """Un conductor no puede poner un estado inválido"""
+        """A driver cannot set an invalid status"""
         self.client.force_authenticate(user=self.driver_user)
         response = self.client.patch(self.url, {'status': 'cancelled'}, format='json')
 
