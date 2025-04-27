@@ -4,7 +4,7 @@ from addresses.serializers import AddressSerializer
 from drivers.serializers import DriverSerializer
 
 class ServiceRequestSerializer(serializers.ModelSerializer):
-    pickup_address = AddressSerializer()
+    pickup_address = AddressSerializer(read_only=True)
     assigned_driver = DriverSerializer(read_only=True)
 
     class Meta:
