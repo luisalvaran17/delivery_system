@@ -43,6 +43,8 @@ def find_nearest_driver(pickup_address):
                 )
 
                 route_summary = route['features'][0]['properties']['summary']
+                if not route_summary:
+                    continue
                 distance_km = route_summary['distance'] / 1000  # Convert meters to kilometers
                 duration_minutes = route_summary['duration'] / 60  # Convert seconds to minutes
 
