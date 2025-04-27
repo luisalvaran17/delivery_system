@@ -100,7 +100,6 @@ class DriverSerializerTest(TestCase):
     def test_driver_serializer_valid(self):
         """Test the driver serializer with valid data."""
         from drivers.serializers import DriverSerializer
-        print('self.driver_data', self.driver_data)
         serializer = DriverSerializer(data=self.driver_data)
 
         self.assertTrue(serializer.is_valid())  # Verify that the serializer is valid
