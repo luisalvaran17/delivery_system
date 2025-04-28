@@ -13,7 +13,7 @@ def create_pickup_address(pickup_address_data):
         pickup_address = Address.objects.create(**pickup_address_data)
         return pickup_address
     except Exception as e:
-        raise ValidationError(f'Error creating pickup address: {str(e)}')
+        raise ValidationError(f"Error creating pickup address: {str(e)}")
 
 
 def assign_driver_to_service(pickup_address):
@@ -22,9 +22,9 @@ def assign_driver_to_service(pickup_address):
     """
     available_nearest_driver, _, estimated_time = find_nearest_driver(pickup_address)
     if not available_nearest_driver:
-        raise ValidationError('No available drivers')
+        raise ValidationError("No available drivers")
     if estimated_time is None:
-        raise ValidationError('Unable to estimate time for the driver')
+        raise ValidationError("Unable to estimate time for the driver")
     return available_nearest_driver, estimated_time
 
 
@@ -38,11 +38,11 @@ def create_service_request(client, pickup_address, assigned_driver, estimated_ti
             pickup_address=pickup_address,
             assigned_driver=assigned_driver,
             estimated_time_minutes=estimated_time,
-            status='in progress'
+            status="in progress",
         )
         return service_request
     except Exception as e:
-        raise ValidationError(f'Error creating service request: {str(e)}')
+        raise ValidationError(f"Error creating service request: {str(e)}")
 
 
 def update_driver_availability(assigned_driver):
@@ -53,7 +53,7 @@ def update_driver_availability(assigned_driver):
         assigned_driver.is_available = False
         assigned_driver.save()
     except Exception as e:
-        raise ValidationError(f'Error updating driver availability: {str(e)}')
+        raise ValidationError(f"Error updating driver availability: {str(e)}")
 
 
 def update_service_driver(service, status_service):
@@ -67,4 +67,6 @@ def update_service_driver(service, status_service):
         service.save()
         assigned_driver.save()
     except Exception as e:
-        raise ValidationError(f'Error updating service status or driver availability: {str(e)}')
+        raise ValidationError(
+            f"Error updating service status or driver availability: {str(e)}"
+        )
