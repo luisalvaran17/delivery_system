@@ -5,7 +5,7 @@ from addresses.serializers import AddressSerializer
 from django.contrib.auth.models import User
 
 class DriverSerializer(serializers.ModelSerializer):
-    current_address = AddressSerializer(read_only=True)
+    current_address = AddressSerializer()
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False)
 
     class Meta:
