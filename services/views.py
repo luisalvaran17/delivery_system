@@ -94,9 +94,7 @@ class CompleteServiceView(generics.UpdateAPIView):
         try:
             update_service_driver(service, status_service)
         except ValidationError as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         # Return response with updated service
-        return Response(
-            {"msg": "Service completed successfully"}, status=status.HTTP_200_OK
-        )
+        return Response({'msg': 'Service completed successfully'}, status=status.HTTP_200_OK)
