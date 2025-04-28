@@ -12,15 +12,6 @@ This is a backend system for a delivery service that allows users to manage addr
 - **Docker**: Used for containerizing the application and managing dependencies with `docker-compose.yml`.
 - **JWT Authentication**: JSON Web Tokens (JWT) are used to secure API endpoints and provide authentication.
 
-## Technologies Used
-
-- Python 3.x
-- Django
-- Django Rest Framework (DRF)
-- PostgreSQL
-- Docker (docker-compose.yml)
-- JWT Authentication
-
 ## Setup and Installation
 
 ### Prerequisites
@@ -58,6 +49,7 @@ DATABASE_USER=<your-database-username>
 DATABASE_PASSWORD=<your-database-password>
 DATABASE_HOST=db
 DATABASE_PORT=5432
+OPENROUTE_SERVICE_KEY=<your-openrouteservice-apikey>
 ```
 
 ### Running Migrations
@@ -67,6 +59,18 @@ Once the containers are up and running, you can apply the migrations to create t
 ```bash
 docker-compose exec web python manage.py migrate
 ```
+
+### Faker
+
+You can populate the database with fake addresses and drivers for testing purposes using the seed command.
+
+```bash
+docker-compose exec web python manage.py seed_data
+```
+
+This will create:
+- 20 random addresses.
+- 20 random drivers with associated users and addresses.
 
 ## API Endpoints: Service Requests
 
