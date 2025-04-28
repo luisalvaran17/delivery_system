@@ -74,40 +74,40 @@ docker-compose exec web python manage.py migrate
    - **Endpoint**: `POST /api/services/`
    - **Description**: Create a new service request.
    - **Request Body**:
-     ```json
-    {   
-      "pickup_address": {
-          "street": "Cl. 68a #90a – 31",
-          "city": "Bogotá",
-          "latitude": 4.693408,
-          "longitude": -74.112279
-      } 
-    }
-     ```
+      ```json
+       {   
+         "pickup_address": {
+             "street": "Cl. 68a #90a – 31",
+             "city": "Bogotá",
+             "latitude": 4.693408,
+             "longitude": -74.112279
+         } 
+       }
+      ```
    - **Response**:
      ```json
-     {
-        "id": 9,
-        "client": "client1",
-        "pickup_address": {
-            ...
-        },
-        "assigned_driver": {
-            "id": 116,
-            "user": "esteban74",
-            "current_address": {
-                "id": 181,
-                "street": "Avenida Caracas 58",
-                "city": "Bogotá",
-                "latitude": 4.655587,
-                "longitude": -74.103641
-            },
-            "is_available": false
-        },
-        "estimated_time_minutes": 15,
-        "created_at": "2025-04-28T01:38:32.382421Z",
-        "status": "in progress"
-    }
+        {
+           "id": 9,
+           "client": "client1",
+           "pickup_address": {
+               ...
+           },
+           "assigned_driver": {
+               "id": 116,
+               "user": "esteban74",
+               "current_address": {
+                   "id": 181,
+                   "street": "Avenida Caracas 58",
+                   "city": "Bogotá",
+                   "latitude": 4.655587,
+                   "longitude": -74.103641
+               },
+               "is_available": false
+           },
+           "estimated_time_minutes": 15,
+           "created_at": "2025-04-28T01:38:32.382421Z",
+           "status": "in progress"
+       }
      ```
 
 ### 2. **Get Address List**
@@ -131,9 +131,9 @@ docker-compose exec web python manage.py migrate
    - **Description**: Complete a specific service by driver.
    - **Request Body**:
      ```json
-    {
+      {
       "status": "completed"
-    }
+      }
      ```
 
 ## API Endpoints: Addresses CRUD
