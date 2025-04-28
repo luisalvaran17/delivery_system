@@ -221,12 +221,6 @@ This will create:
 ### 5. **Delete Address**
    - **Endpoint**: `DELETE /api/addresses/{id}/`
    - **Description**: Delete a specific address.
-   - **Response**:
-     ```json
-     {
-       "message": "Address deleted successfully."
-     }
-     ```
 
 
 ## API Endpoints: Drivers CRUD
