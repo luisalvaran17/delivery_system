@@ -68,6 +68,74 @@ Once the containers are up and running, you can apply the migrations to create t
 docker-compose exec web python manage.py migrate
 ```
 
+## API Endpoints: Service Requests
+
+### 1. **Request Service**
+   - **Endpoint**: `POST /api/services/`
+   - **Description**: Create a new service request.
+   - **Request Body**:
+     ```json
+    {   
+      "pickup_address": {
+          "street": "Cl. 68a #90a – 31",
+          "city": "Bogotá",
+          "latitude": 4.693408,
+          "longitude": -74.112279
+      } 
+    }
+     ```
+   - **Response**:
+     ```json
+     {
+        "id": 9,
+        "client": "client1",
+        "pickup_address": {
+            ...
+        },
+        "assigned_driver": {
+            "id": 116,
+            "user": "esteban74",
+            "current_address": {
+                "id": 181,
+                "street": "Avenida Caracas 58",
+                "city": "Bogotá",
+                "latitude": 4.655587,
+                "longitude": -74.103641
+            },
+            "is_available": false
+        },
+        "estimated_time_minutes": 15,
+        "created_at": "2025-04-28T01:38:32.382421Z",
+        "status": "in progress"
+    }
+     ```
+
+### 2. **Get Address List**
+   - **Endpoint**: `GET /api/services/`
+   - **Description**: Get a list of all services.
+
+### 3. **Get Service Detail**
+   - **Endpoint**: `GET /api/services/{id}/`
+   - **Description**: Get details of a specific service.
+
+### 4. **Update Service**
+   - **Endpoint**: `PUT /api/services/{id}/`
+   - **Description**: Update a specific service.
+
+### 5. **Delete Service**
+   - **Endpoint**: `DELETE /api/services/{id}/`
+   - **Description**: Delete a specific service.
+
+### 6. **Complete Service Request**
+   - **Endpoint**: `DELETE /api/services/{id}/complete/`
+   - **Description**: Complete a specific service by driver.
+   - **Request Body**:
+     ```json
+    {
+      "status": "completed"
+    }
+     ```
+
 ## API Endpoints: Addresses CRUD
 
 ### 1. **Create Address**
@@ -165,23 +233,7 @@ docker-compose exec web python manage.py migrate
    - **Request Body**:
      ```json
      {
-       "name": "John Doe",
        "current_address": {
-         "street": "Av. Siempre Viva",
-         "city": "Bogotá",
-         "latitude": 4.60971,
-         "longitude": -74.08175
-       },
-       "is_available": true
-     }
-     ```
-   - **Response**:
-     ```json
-     {
-       "id": 1,
-       "name": "John Doe",
-       "current_address": {
-         "id": 1,
          "street": "Av. Siempre Viva",
          "city": "Bogotá",
          "latitude": 4.60971,
@@ -199,7 +251,7 @@ docker-compose exec web python manage.py migrate
      [
        {
          "id": 1,
-         "name": "John Doe",
+         "user": "yarrieta",
          "current_address": {
            "id": 1,
            "street": "Av. Siempre Viva",
@@ -215,21 +267,6 @@ docker-compose exec web python manage.py migrate
 ### 3. **Get Driver Detail**
    - **Endpoint**: `GET /api/drivers/{id}/`
    - **Description**: Get details of a specific driver.
-   - **Response**:
-     ```json
-     {
-       "id": 1,
-       "name": "John Doe",
-       "current_address": {
-         "id": 1,
-         "street": "Av. Siempre Viva",
-         "city": "Bogotá",
-         "latitude": 4.60971,
-         "longitude": -74.08175
-       },
-       "is_available": true
-     }
-     ```
 
 ### 4. **Update Driver**
    - **Endpoint**: `PUT /api/drivers/{id}/`
@@ -237,23 +274,7 @@ docker-compose exec web python manage.py migrate
    - **Request Body**:
      ```json
      {
-       "name": "Jane Doe",
        "current_address": {
-         "street": "New Street",
-         "city": "New City",
-         "latitude": 4.61000,
-         "longitude": -74.08000
-       },
-       "is_available": false
-     }
-     ```
-   - **Response**:
-     ```json
-     {
-       "id": 1,
-       "name": "Jane Doe",
-       "current_address": {
-         "id": 2,
          "street": "New Street",
          "city": "New City",
          "latitude": 4.61000,
@@ -266,12 +287,6 @@ docker-compose exec web python manage.py migrate
 ### 5. **Delete Driver**
    - **Endpoint**: `DELETE /api/drivers/{id}/`
    - **Description**: Delete a specific driver.
-   - **Response**:
-     ```json
-     {
-       "message": "Driver deleted successfully."
-     }
-     ```
 
 
 ## Authentication
