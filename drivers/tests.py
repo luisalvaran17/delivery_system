@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from addresses.models import Address
 from drivers.models import Driver
 
+
 class DriverModelTest(TestCase):
     """Test the Driver model."""
 
@@ -17,9 +18,7 @@ class DriverModelTest(TestCase):
         """Test creating a driver."""
         # Create a user for the driver
         user = User.objects.create_user(
-            username="carlos_perez",
-            password="password",
-            email="carlos@example.com"
+            username="carlos_perez", password="password", email="carlos@example.com"
         )
 
         # Create the driver and associate it with the user
@@ -31,16 +30,16 @@ class DriverModelTest(TestCase):
 
         # Verify that the driver was created successfully in the database
         self.assertEqual(Driver.objects.count(), 1)
-        self.assertEqual(driver.user.username, "carlos_perez")  # Check the user related to the driver
+        self.assertEqual(
+            driver.user.username, "carlos_perez"
+        )  # Check the user related to the driver
         self.assertEqual(driver.current_address, self.address)
         self.assertEqual(driver.is_available, True)
 
     def test_driver_str_method(self):
         """Test the __str__ method for driver."""
         user = User.objects.create_user(
-            username="ana_garcia",
-            password="password",
-            email="ana@example.com"
+            username="ana_garcia", password="password", email="ana@example.com"
         )
         driver = Driver.objects.create(
             user=user,
@@ -49,14 +48,14 @@ class DriverModelTest(TestCase):
         )
 
         # Verify that the string representation of the driver matches the user's username or full name
-        self.assertEqual(str(driver), "ana_garcia")  # Here we use the username of the user
+        self.assertEqual(
+            str(driver), "ana_garcia"
+        )  # Here we use the username of the user
 
     def test_driver_is_available(self):
         """Test changing the availability of the driver."""
         user = User.objects.create_user(
-            username="jorge_lopez",
-            password="password",
-            email="jorge@example.com"
+            username="jorge_lopez", password="password", email="jorge@example.com"
         )
         driver = Driver.objects.create(
             user=user,
@@ -64,14 +63,15 @@ class DriverModelTest(TestCase):
             is_available=True,
         )
         self.assertTrue(driver.is_available)
-        
+
         driver.is_available = False
         driver.save()
-        
+
         # Reload the object from the database
         driver.refresh_from_db()
-        
+
         self.assertFalse(driver.is_available)
+
 
 class DriverSerializerTest(TestCase):
     """Test the Driver serializer."""
@@ -100,6 +100,7 @@ class DriverSerializerTest(TestCase):
     def test_driver_serializer_valid(self):
         """Test the driver serializer with valid data."""
         from drivers.serializers import DriverSerializer
+
         serializer = DriverSerializer(data=self.driver_data)
 
         self.assertTrue(serializer.is_valid())  # Verify that the serializer is valid
@@ -109,4 +110,4 @@ class DriverSerializerTest(TestCase):
         self.assertEqual(driver.user.username, self.user.username)
 
         # Verify that the driver's availability matches the provided data
-        self.assertEqual(driver.is_available, self.driver_data['is_available'])
+        self.assertEqual(driver.is_available, self.driver_data["is_available"])
