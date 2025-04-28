@@ -9,7 +9,7 @@ client = openrouteservice.Client(key=ORS_API_KEY)
 
 
 def haversine_distance(lat1, lon1, lat2, lon2):
-    R = 6371.0  # Earth radius in kilometers
+    R = 6356.752  # Earth radius in kilometers
     lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
     dlon = lon2 - lon1
     dlat = lat2 - lat1
@@ -28,7 +28,7 @@ def find_nearest_driver(pickup_address, candidates_limit=10):
         is_available=True, current_address__isnull=False
     )
 
-    if not available_drivers.exists():
+    if not available_drivers:
         raise Exception("No available drivers")
 
     pickup_lat = pickup_address.latitude

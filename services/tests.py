@@ -7,6 +7,10 @@ from addresses.models import Address
 from drivers.models import Driver
 from services.models import ServiceRequest
 
+from unittest.mock import patch, MagicMock
+from .helpers import haversine_distance, find_nearest_driver
+from geopy.distance import geodesic
+
 
 class CompleteServiceViewTests(TestCase):
     def setUp(self):
@@ -78,3 +82,91 @@ class CompleteServiceViewTests(TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertIn("Invalid status", str(response.content))
+
+
+class DriverTests(TestCase):
+
+    @patch("services.helpers.openrouteservice.Client.directions")
+    @patch("services.helpers.Driver.objects.filter")
+    def test_find_nearest_driver(self, mock_filter, mock_directions):
+        # Create mock Address instances
+        address_1 = Address.objects.create(
+            street="Street 1", city="City 1", latitude=10.0, longitude=20.0
+        )
+        address_2 = Address.objects.create(
+            street="Street 2", city="City 2", latitude=15.0, longitude=25.0
+        )
+
+        # Create a mock user (this is necessary to avoid the ForeignKey error)
+        user_1 = User.objects.create(username="user1", password="password")
+        user_2 = User.objects.create(username="user2", password="password")
+
+        # Create drivers with the associated user and address
+        driver_1 = Driver.objects.create(
+            user=user_1,  # Assigning the created user
+            current_address=address_1,
+            is_available=True,
+        )
+        driver_2 = Driver.objects.create(
+            user=user_2,  # Assigning the created user
+            current_address=address_2,
+            is_available=True,
+        )
+
+        # Mock the response from OpenRouteService for both drivers
+        mock_route_1 = {
+            "features": [
+                {
+                    "properties": {
+                        "summary": {
+                            "distance": 1000,  # in meters
+                            "duration": 600,  # in seconds
+                        }
+                    }
+                }
+            ]
+        }
+
+        mock_route_2 = {
+            "features": [
+                {
+                    "properties": {
+                        "summary": {
+                            "distance": 2000,  # in meters
+                            "duration": 1200,  # in seconds
+                        }
+                    }
+                }
+            ]
+        }
+
+        # Configure the mock responses
+        mock_directions.side_effect = [mock_route_1, mock_route_2]
+        mock_filter.return_value = [driver_1, driver_2]
+
+        # Create a mock pickup address with latitude and longitude
+        pickup_address = MagicMock()
+        pickup_address.latitude = 12.0
+        pickup_address.longitude = 22.0
+
+        # Call the function to find the nearest driver
+        nearest_driver, min_distance, estimated_time_minutes = find_nearest_driver(
+            pickup_address
+        )
+
+        # Assert that the nearest driver is driver_1
+        self.assertEqual(nearest_driver, driver_1)
+        self.assertEqual(min_distance, 1.0)  # in kilometers
+        self.assertEqual(estimated_time_minutes, 10)  # in minutes
+
+    def test_haversine_distance(self):
+        # Test Haversine distance calculation
+        lat1, lon1 = 10.0, 20.0
+        lat2, lon2 = 15.0, 25.0
+        result = haversine_distance(lat1, lon1, lat2, lon2)
+
+        # Use geopy to calculate the actual distance as a reference
+        expected_distance = geodesic((lat1, lon1), (lat2, lon2)).kilometers
+
+        # Assert that the result is approximately equal to the expected value
+        self.assertAlmostEqual(result, expected_distance, delta=0.5)
